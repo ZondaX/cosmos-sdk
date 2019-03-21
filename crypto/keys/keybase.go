@@ -229,6 +229,8 @@ func (kb dbKeybase) Sign(name, passphrase string, msg []byte) (sig []byte, pub t
 		return
 	}
 
+	fmt.Println("name: ", name)
+
 	var priv tmcrypto.PrivKey
 
 	switch info.(type) {

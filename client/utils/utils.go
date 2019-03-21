@@ -50,6 +50,7 @@ func CompleteAndBroadcastTxCLI(txBldr authtxb.TxBuilder, cliCtx context.CLIConte
 	}
 
 	fromName := cliCtx.GetFromName()
+	fmt.Println("fromName: ", fromName)
 
 	if txBldr.SimulateAndExecute() || cliCtx.Simulate {
 		txBldr, err = EnrichWithGas(txBldr, cliCtx, msgs)

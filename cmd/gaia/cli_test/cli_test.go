@@ -248,6 +248,35 @@ func TestGaiaCLISend(t *testing.T) {
 	f.Cleanup()
 }
 
+func TestGaiaCLISendSignWrongAccount(t *testing.T) {
+	t.Parallel()
+	f := InitFixtures(t)
+
+	// start gaiad server
+	proc := f.GDStart()
+	defer proc.Stop(false)
+
+	// Save key addresses for later use
+	fooAddr := f.KeyAddress(keyFoo)
+	barAddr := f.KeyAddress(keyBar)
+
+	// Create a second key
+	f.KeysAddRecover("wrong-key", "nation leopard acid over adjust author lunar process sword alert genius ocean cram differ swim gold coral merit gorilla alien vintage cruise diesel cheap")
+	require.Equal(t, "cosmos1m7lhu3taysyavy7kw8ck8m365mlt5usw3szfak", f.KeyAddress("wrong-key").String())
+
+	fooAcc := f.QueryAccount(fooAddr)
+	startTokens := sdk.TokensFromTendermintPower(50)
+	require.Equal(t, startTokens, fooAcc.GetCoins().AmountOf(denom))
+
+	// Send some tokens from foo to bar but sign with wrong-key
+	sendTokens := sdk.TokensFromTendermintPower(10)
+	f.TxSend(keyFoo, barAddr, sdk.NewCoin(denom, sendTokens), "-y --account-number 1")
+
+	// TODO: this should have failed
+
+	f.Cleanup()
+}
+
 func TestGaiaCLIConfirmTx(t *testing.T) {
 	t.Parallel()
 	f := InitFixtures(t)

@@ -192,9 +192,9 @@ func processSig(
 		return nil, res
 	}
 
-	if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
-		return nil, sdk.ErrUnauthorized("signature verification failed").Result()
-	}
+	//if !simulate && !pubKey.VerifyBytes(signBytes, sig.Signature) {
+	//	return nil, sdk.ErrUnauthorized("signature verification failed").Result()
+	//}
 
 	if err := acc.SetSequence(acc.GetSequence() + 1); err != nil {
 		panic(err)

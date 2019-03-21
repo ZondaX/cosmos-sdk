@@ -228,6 +228,7 @@ func (bldr TxBuilder) BuildAndSign(name, passphrase string, msgs []sdk.Msg) ([]b
 	if err != nil {
 		return nil, err
 	}
+	fmt.Println("message: ", msg)
 
 	return bldr.Sign(name, passphrase, msg)
 }
