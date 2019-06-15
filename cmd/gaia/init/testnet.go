@@ -3,17 +3,18 @@ package init
 // DONTCOVER
 
 import (
+	"bufio"
 	"encoding/json"
 	"fmt"
 	"net"
 	"os"
 	"path/filepath"
 
-	"github.com/cosmos/cosmos-sdk/client/keys"
-
 	"github.com/cosmos/cosmos-sdk/client"
+	"github.com/cosmos/cosmos-sdk/client/keys"
 	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
 	"github.com/cosmos/cosmos-sdk/codec"
+	"github.com/cosmos/cosmos-sdk/server"
 	srvconfig "github.com/cosmos/cosmos-sdk/server/config"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/cosmos-sdk/x/auth"
@@ -23,13 +24,12 @@ import (
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+
 	tmconfig "github.com/tendermint/tendermint/config"
 	"github.com/tendermint/tendermint/crypto"
 	cmn "github.com/tendermint/tendermint/libs/common"
 	"github.com/tendermint/tendermint/types"
 	tmtime "github.com/tendermint/tendermint/types/time"
-
-	"github.com/cosmos/cosmos-sdk/server"
 )
 
 var (
@@ -156,12 +156,12 @@ func initTestnet(config *tmconfig.Config, cdc *codec.Codec) error {
 		memo := fmt.Sprintf("%s@%s:26656", nodeIDs[i], ip)
 		genFiles = append(genFiles, config.GenesisFile())
 
-		buf := client.BufferStdin()
+		inBuf := bufio.NewReader(os.Stdin)
 		prompt := fmt.Sprintf(
 			"Password for account '%s' (default %s):", nodeDirName, app.DefaultKeyPass,
 		)
 
-		keyPass, err := client.GetPassword(prompt, buf)
+		keyPass, err := client.GetPassword(prompt, inBuf)
 		if err != nil && keyPass != "" {
 			// An error was returned that either failed to read the password from
 			// STDIN or the given password is not empty but failed to meet minimum

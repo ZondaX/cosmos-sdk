@@ -3,12 +3,11 @@ package cli
 import (
 	"strings"
 
-	"github.com/spf13/cobra"
-	amino "github.com/tendermint/go-amino"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
 	authclient "github.com/cosmos/cosmos-sdk/x/auth/client"
+	"github.com/tendermint/go-amino"
+	"github.com/zondax/cobra"
 )
 
 // GetSignCommand returns the sign command

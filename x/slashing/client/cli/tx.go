@@ -8,7 +8,7 @@ import (
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/cosmos/cosmos-sdk/x/slashing"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 )
 
 // GetCmdUnjail implements the create unjail validator command.

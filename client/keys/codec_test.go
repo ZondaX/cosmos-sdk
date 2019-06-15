@@ -1,7 +1,6 @@
 package keys
 
 import (
-	"fmt"
 	"reflect"
 	"testing"
 
@@ -59,7 +58,6 @@ func TestMarshalJSON(t *testing.T) {
 				t.Errorf("MarshalJSON() error = %v, wantErr %v", err, tt.wantErr)
 				return
 			}
-			fmt.Printf("%s\n", got)
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("MarshalJSON() = %v, want %v", got, tt.want)
 			}

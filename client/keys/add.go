@@ -1,12 +1,12 @@
 package keys
 
 import (
+	"bufio"
 	"bytes"
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
 	"net/http"
-	"os"
 	"sort"
 
 	"github.com/cosmos/cosmos-sdk/client"
@@ -17,8 +17,8 @@ import (
 	"errors"
 
 	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zondax/cobra"
 
 	"github.com/cosmos/go-bip39"
 
@@ -90,12 +90,12 @@ input
 output
 	- armor encrypted private key (saved to file)
 */
-func runAddCmd(_ *cobra.Command, args []string) error {
+func runAddCmd(cmd *cobra.Command, args []string) error {
 	var kb keys.Keybase
 	var err error
 	var encryptPassword string
 
-	buf := client.BufferStdin()
+	inBuf := bufio.NewReader(cmd.InOrStdin())
 	name := args[0]
 
 	interactive := viper.GetBool(flagInteractive)
@@ -116,7 +116,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 		if err == nil {
 			// account exists, ask for user confirmation
 			if response, err2 := client.GetConfirmation(
-				fmt.Sprintf("override the existing name %s", name), buf); err2 != nil || !response {
+				fmt.Sprintf("override the existing name %s", name), inBuf); err2 != nil || !response {
 				return err2
 			}
 		}
@@ -150,7 +150,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 				return err
 			}
 
-			fmt.Fprintf(os.Stderr, "Key %q saved to disk.", name)
+			cmd.PrintErrf("Key %q saved to disk.", name)
 			return nil
 		}
 
@@ -158,7 +158,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 		if viper.GetString(FlagPublicKey) == "" && !viper.GetBool(client.FlagUseLedger) {
 			encryptPassword, err = client.GetCheckPassword(
 				"Enter a passphrase to encrypt your key to disk:",
-				"Repeat the passphrase:", buf)
+				"Repeat the passphrase:", inBuf)
 			if err != nil {
 				return err
 			}
@@ -187,7 +187,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 			return err
 		}
 
-		return printCreate(info, false, "")
+		return printCreate(cmd, info, false, "")
 	}
 
 	// Get bip39 mnemonic
@@ -200,7 +200,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 			bip39Message = "Enter your bip39 mnemonic, or hit enter to generate one."
 		}
 
-		mnemonic, err = client.GetString(bip39Message, buf)
+		mnemonic, err = client.GetString(bip39Message, inBuf)
 		if err != nil {
 			return err
 		}
@@ -220,7 +220,7 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 	}
 
 	if !bip39.IsMnemonicValid(mnemonic) {
-		fmt.Fprintf(os.Stderr, "Error: Mnemonic is not valid")
+		cmd.PrintErrf("Error: Mnemonic is not valid")
 		return nil
 	}
 
@@ -228,14 +228,14 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 	if interactive {
 		bip39Passphrase, err = client.GetString(
 			"Enter your bip39 passphrase. This is combined with the mnemonic to derive the seed. "+
-				"Most users should just hit enter to use the default, \"\"", buf)
+				"Most users should just hit enter to use the default, \"\"", inBuf)
 		if err != nil {
 			return err
 		}
 
 		// if they use one, make them re-enter it
 		if len(bip39Passphrase) != 0 {
-			p2, err := client.GetString("Repeat the passphrase:", buf)
+			p2, err := client.GetString("Repeat the passphrase:", inBuf)
 			if err != nil {
 				return err
 			}
@@ -258,23 +258,23 @@ func runAddCmd(_ *cobra.Command, args []string) error {
 		mnemonic = ""
 	}
 
-	return printCreate(info, showMnemonic, mnemonic)
+	return printCreate(cmd, info, showMnemonic, mnemonic)
 }
 
-func printCreate(info keys.Info, showMnemonic bool, mnemonic string) error {
+func printCreate(cmd *cobra.Command, info keys.Info, showMnemonic bool, mnemonic string) error {
 	output := viper.Get(cli.OutputFlag)
 
 	switch output {
 	case OutputFormatText:
-		fmt.Fprintln(os.Stderr)
-		printKeyInfo(info, Bech32KeyOutput)
+		cmd.PrintErrln()
+		printKeyInfo(cmd, info, Bech32KeyOutput)
 
 		// print mnemonic unless requested not to.
 		if showMnemonic {
-			fmt.Fprintln(os.Stderr, "\n**Important** write this mnemonic phrase in a safe place.")
-			fmt.Fprintln(os.Stderr, "It is the only way to recover your account if you ever forget your password.")
-			fmt.Fprintln(os.Stderr, "")
-			fmt.Fprintln(os.Stderr, mnemonic)
+			cmd.PrintErrln("\n**Important** write this mnemonic phrase in a safe place.")
+			cmd.PrintErrln("It is the only way to recover your account if you ever forget your password.")
+			cmd.PrintErrln("")
+			cmd.PrintErrln(mnemonic)
 		}
 	case OutputFormatJSON:
 		out, err := Bech32KeyOutput(info)
@@ -296,7 +296,7 @@ func printCreate(info keys.Info, showMnemonic bool, mnemonic string) error {
 		if err != nil {
 			return err
 		}
-		fmt.Fprintln(os.Stderr, string(jsonString))
+		cmd.PrintErrln(string(jsonString))
 	default:
 		return fmt.Errorf("I can't speak: %s", output)
 	}

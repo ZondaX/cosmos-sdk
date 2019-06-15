@@ -15,7 +15,6 @@ const (
 )
 
 var (
-
 	// VersionCmd prints out the current sdk version
 	VersionCmd = &cobra.Command{
 		Use:   "version",

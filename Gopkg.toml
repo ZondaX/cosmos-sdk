@@ -11,8 +11,8 @@
   version = "~0.0.3"
 
 [[constraint]]
-  name = "github.com/spf13/cobra"
-  version = "~0.0.1"
+  name = "github.com/zondax/cobra"
+  revision = "ff1f22c901344661e1cfab72a08f32b1083afabb"
 
 [[constraint]]
   name = "github.com/spf13/viper"

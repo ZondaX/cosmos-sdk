@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/store"
 
 	cpm "github.com/otiai10/copy"
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 
 	abci "github.com/tendermint/tendermint/abci/types"
 	bcm "github.com/tendermint/tendermint/blockchain"

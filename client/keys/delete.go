@@ -4,11 +4,8 @@ import (
 	"bufio"
 	"encoding/json"
 	"errors"
-	"fmt"
-	"net/http"
-	"os"
-
 	"github.com/spf13/viper"
+	"net/http"
 
 	"github.com/gorilla/mux"
 
@@ -16,7 +13,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 )
 
 const (
@@ -59,17 +56,17 @@ func runDeleteCmd(cmd *cobra.Command, args []string) error {
 		return err
 	}
 
-	buf := client.BufferStdin()
+	inBuf := bufio.NewReader(cmd.InOrStdin())
 	if info.GetType() == keys.TypeLedger || info.GetType() == keys.TypeOffline {
 		if !viper.GetBool(flagYes) {
-			if err := confirmDeletion(buf); err != nil {
+			if err := confirmDeletion(inBuf); err != nil {
 				return err
 			}
 		}
 		if err := kb.Delete(name, "", true); err != nil {
 			return err
 		}
-		fmt.Fprintln(os.Stderr, "Public key reference deleted")
+		cmd.Println("Public key reference deleted")
 		return nil
 	}
 
@@ -78,7 +75,7 @@ func runDeleteCmd(cmd *cobra.Command, args []string) error {
 	var oldpass string
 	if !skipPass {
 		if oldpass, err = client.GetPassword(
-			"DANGER - enter password to permanently delete key:", buf); err != nil {
+			"DANGER - enter password to permanently delete key:", inBuf); err != nil {
 			return err
 		}
 	}
@@ -87,7 +84,7 @@ func runDeleteCmd(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Fprintln(os.Stderr, "Key deleted forever (uh oh!)")
+	cmd.Println("Key deleted forever (uh oh!)")
 	return nil
 }
 

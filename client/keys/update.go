@@ -1,8 +1,8 @@
 package keys
 
 import (
+	"bufio"
 	"encoding/json"
-	"fmt"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -10,7 +10,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/crypto/keys"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 
 	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
 )
@@ -28,13 +28,13 @@ func updateKeyCommand() *cobra.Command {
 func runUpdateCmd(cmd *cobra.Command, args []string) error {
 	name := args[0]
 
-	buf := client.BufferStdin()
+	inBuf := bufio.NewReader(cmd.InOrStdin())
 	kb, err := NewKeyBaseFromHomeFlag()
 	if err != nil {
 		return err
 	}
 	oldpass, err := client.GetPassword(
-		"Enter the current passphrase:", buf)
+		"Enter the current passphrase:", inBuf)
 	if err != nil {
 		return err
 	}
@@ -42,14 +42,14 @@ func runUpdateCmd(cmd *cobra.Command, args []string) error {
 	getNewpass := func() (string, error) {
 		return client.GetCheckPassword(
 			"Enter the new passphrase:",
-			"Repeat the new passphrase:", buf)
+			"Repeat the new passphrase:", inBuf)
 	}
 
 	err = kb.Update(name, oldpass, getNewpass)
 	if err != nil {
 		return err
 	}
-	fmt.Println("Password successfully updated!")
+	cmd.Println("Password successfully updated!")
 	return nil
 }
 

@@ -1,8 +1,10 @@
 package keys
 
 import (
+	"bufio"
 	"fmt"
 	"net/http"
+	"os"
 	"path/filepath"
 
 	"github.com/spf13/viper"
@@ -63,7 +65,7 @@ func GetPassphrase(name string) (string, error) {
 // ReadPassphraseFromStdin attempts to read a passphrase from STDIN return an
 // error upon failure.
 func ReadPassphraseFromStdin(name string) (string, error) {
-	buf := client.BufferStdin()
+	buf := bufio.NewReader(os.Stdin)
 	prompt := fmt.Sprintf("Password to sign with '%s':", name)
 
 	passphrase, err := client.GetPassword(prompt, buf)
@@ -156,7 +158,7 @@ func Bech32ValKeyOutput(keyInfo keys.Info) (KeyOutput, error) {
 	}, nil
 }
 
-func printKeyInfo(keyInfo keys.Info, bechKeyOut bechKeyOutFn) {
+func printKeyInfo(p client.PrintCapable, keyInfo keys.Info, bechKeyOut bechKeyOutFn) {
 	ko, err := bechKeyOut(keyInfo)
 	if err != nil {
 		panic(err)
@@ -164,58 +166,58 @@ func printKeyInfo(keyInfo keys.Info, bechKeyOut bechKeyOutFn) {
 
 	switch viper.Get(cli.OutputFlag) {
 	case OutputFormatText:
-		fmt.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
-		printKeyOutput(ko)
+		p.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
+		printKeyOutput(p, ko)
 	case "json":
 		out, err := MarshalJSON(ko)
 		if err != nil {
 			panic(err)
 		}
 
-		fmt.Println(string(out))
+		p.Println(string(out))
 	}
 }
 
-func printInfos(infos []keys.Info) {
+func printInfos(p client.PrintCapable, infos []keys.Info) {
 	kos, err := Bech32KeysOutput(infos)
 	if err != nil {
 		panic(err)
 	}
 	switch viper.Get(cli.OutputFlag) {
 	case OutputFormatText:
-		fmt.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
+		p.Printf("NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\n")
 		for _, ko := range kos {
-			printKeyOutput(ko)
+			printKeyOutput(p, ko)
 		}
 	case OutputFormatJSON:
 		out, err := MarshalJSON(kos)
 		if err != nil {
 			panic(err)
 		}
-		fmt.Println(string(out))
+		p.Printf(string(out))
 	}
 }
 
-func printKeyOutput(ko KeyOutput) {
-	fmt.Printf("%s\t%s\t%s\t%s\n", ko.Name, ko.Type, ko.Address, ko.PubKey)
+func printKeyOutput(p client.PrintCapable, ko KeyOutput) {
+	p.Printf("%s\t%s\t%s\t%s\n", ko.Name, ko.Type, ko.Address, ko.PubKey)
 }
 
-func printKeyAddress(info keys.Info, bechKeyOut bechKeyOutFn) {
+func printKeyAddress(p client.PrintCapable, info keys.Info, bechKeyOut bechKeyOutFn) {
 	ko, err := bechKeyOut(info)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(ko.Address)
+	p.Println(ko.Address)
 }
 
-func printPubKey(info keys.Info, bechKeyOut bechKeyOutFn) {
+func printPubKey(p client.PrintCapable, info keys.Info, bechKeyOut bechKeyOutFn) {
 	ko, err := bechKeyOut(info)
 	if err != nil {
 		panic(err)
 	}
 
-	fmt.Println(ko.PubKey)
+	p.Println(ko.PubKey)
 }
 
 // PostProcessResponse performs post process for rest response

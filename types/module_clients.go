@@ -1,7 +1,7 @@
 package types
 
 import (
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 )
 
 // ModuleClients helps modules provide a standard interface for exporting client functionality

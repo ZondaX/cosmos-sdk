@@ -14,8 +14,8 @@ import (
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/cosmos/cosmos-sdk/x/staking"
 
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zondax/cobra"
 )
 
 // GetCmdCreateValidator implements the create validator command handler.

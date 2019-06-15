@@ -3,6 +3,14 @@ package main
 import (
 	"encoding/json"
 	"io"
+	"os"
+
+	"github.com/cosmos/cosmos-sdk/baseapp"
+	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
+	gaiaInit "github.com/cosmos/cosmos-sdk/cmd/gaia/init"
+	"github.com/cosmos/cosmos-sdk/server"
+	"github.com/cosmos/cosmos-sdk/store"
+	sdk "github.com/cosmos/cosmos-sdk/types"
 
 	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
@@ -12,14 +20,6 @@ import (
 	dbm "github.com/tendermint/tendermint/libs/db"
 	"github.com/tendermint/tendermint/libs/log"
 	tmtypes "github.com/tendermint/tendermint/types"
-
-	"github.com/cosmos/cosmos-sdk/baseapp"
-	"github.com/cosmos/cosmos-sdk/client"
-	"github.com/cosmos/cosmos-sdk/cmd/gaia/app"
-	gaiaInit "github.com/cosmos/cosmos-sdk/cmd/gaia/init"
-	"github.com/cosmos/cosmos-sdk/server"
-	"github.com/cosmos/cosmos-sdk/store"
-	sdk "github.com/cosmos/cosmos-sdk/types"
 )
 
 func main() {
@@ -44,7 +44,7 @@ func main() {
 	rootCmd.AddCommand(gaiaInit.GenTxCmd(ctx, cdc))
 	rootCmd.AddCommand(gaiaInit.AddGenesisAccountCmd(ctx, cdc))
 	rootCmd.AddCommand(gaiaInit.ValidateGenesisCmd(ctx, cdc))
-	rootCmd.AddCommand(client.NewCompletionCmd(rootCmd, true))
+	rootCmd.AddCommand(NewCompletionCmd(rootCmd, true))
 
 	server.AddCommands(ctx, cdc, rootCmd, newApp, exportAppStateAndTMValidators)
 
@@ -78,4 +78,36 @@ func exportAppStateAndTMValidators(
 	}
 	gApp := app.NewGaiaApp(logger, db, traceStore, true)
 	return gApp.ExportAppStateAndValidators(forZeroHeight, jailWhiteList)
+}
+
+// NewCompletionCmd builds a cobra.Command that generate bash completion
+// scripts for the given root command. If hidden is true, the command
+// will not show up in the root command's list of available commands.
+func NewCompletionCmd(rootCmd *cobra.Command, hidden bool) *cobra.Command {
+	flagZsh := "zsh"
+	cmd := &cobra.Command{
+		Use:   "completion",
+		Short: "Generate Bash/Zsh completion script to STDOUT",
+		Long: `To load completion script run
+
+. <(completion_script)
+
+To configure your bash shell to load completions for each session add to your bashrc
+
+# ~/.bashrc or ~/.profile
+. <(completion_script)
+`,
+		RunE: func(_ *cobra.Command, _ []string) error {
+			if viper.GetBool(flagZsh) {
+				return rootCmd.GenZshCompletion(os.Stdout)
+			}
+			return rootCmd.GenBashCompletion(os.Stdout)
+		},
+		Hidden: hidden,
+		Args:   cobra.NoArgs,
+	}
+
+	cmd.Flags().Bool(flagZsh, false, "Generate Zsh completion script")
+
+	return cmd
 }

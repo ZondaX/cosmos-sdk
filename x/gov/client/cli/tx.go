@@ -13,7 +13,7 @@ import (
 
 	"strings"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 
 	govClientUtils "github.com/cosmos/cosmos-sdk/x/gov/client/utils"
 )

@@ -5,7 +5,7 @@ import (
 	"strconv"
 	"strings"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 
 	"github.com/cosmos/cosmos-sdk/client/context"
 	"github.com/cosmos/cosmos-sdk/codec"

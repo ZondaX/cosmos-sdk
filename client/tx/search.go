@@ -15,8 +15,8 @@ import (
 	"github.com/cosmos/cosmos-sdk/codec"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/zondax/cobra"
 
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"
 	"github.com/tendermint/tendermint/types"
@@ -87,7 +87,7 @@ $ gaiacli query txs --tags '<tag1>:<value1>&<tag2>:<value2>' --page 1 --limit 30
 				return err
 			}
 
-			fmt.Println(string(output))
+			cmd.Println(string(output))
 			return nil
 		},
 	}

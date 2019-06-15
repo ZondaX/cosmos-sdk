@@ -11,7 +11,7 @@ import (
 	authtxb "github.com/cosmos/cosmos-sdk/x/auth/client/txbuilder"
 	"github.com/cosmos/cosmos-sdk/x/bank"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 )
 
 const (

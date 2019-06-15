@@ -7,7 +7,7 @@ import (
 
 	"github.com/cosmos/cosmos-sdk/client/rest"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 
 	"github.com/spf13/viper"
 	ctypes "github.com/tendermint/tendermint/rpc/core/types"

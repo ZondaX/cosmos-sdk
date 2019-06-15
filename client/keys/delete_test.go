@@ -5,8 +5,6 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/cosmos/cosmos-sdk/client"
-
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/spf13/viper"
 	"github.com/stretchr/testify/assert"
@@ -16,6 +14,7 @@ import (
 
 func Test_runDeleteCmd(t *testing.T) {
 	deleteKeyCommand := deleteKeyCommand()
+	mockIn, _, _ := tests.ApplyMockIO(deleteKeyCommand)
 
 	yesF, _ := deleteKeyCommand.Flags().GetBool(flagYes)
 	forceF, _ := deleteKeyCommand.Flags().GetBool(flagForce)
@@ -52,8 +51,7 @@ func Test_runDeleteCmd(t *testing.T) {
 		require.NoError(t, err)
 
 		// Now there is a confirmation
-		cleanUp := client.OverrideStdin(bufio.NewReader(strings.NewReader("y\n")))
-		defer cleanUp()
+		mockIn.Reset("y\n")
 		err = runDeleteCmd(deleteKeyCommand, []string{fakeKeyName1})
 		require.NoError(t, err)
 

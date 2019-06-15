@@ -505,6 +505,13 @@
   revision = "v0.30.0-rc0"
 
 [[projects]]
+  digest = "1:1fc1f4a4e9294c87c32e6885f703aca1f3a912872c4020e3423f4762b29875be"
+  name = "github.com/zondax/cobra"
+  packages = ["."]
+  pruneopts = "UT"
+  revision = "ff1f22c901344661e1cfab72a08f32b1083afabb"
+
+[[projects]]
   digest = "1:b73f5e117bc7c6e8fc47128f20db48a873324ad5cfeeebfc505e85c58682b5e4"
   name = "github.com/zondax/hid"
   packages = ["."]
@@ -717,6 +724,7 @@
     "github.com/tendermint/tendermint/types",
     "github.com/tendermint/tendermint/types/time",
     "github.com/tendermint/tendermint/version",
+    "github.com/zondax/cobra",
     "github.com/zondax/ledger-cosmos-go",
     "golang.org/x/crypto/bcrypt",
   ]

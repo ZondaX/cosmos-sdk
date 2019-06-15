@@ -7,11 +7,10 @@ import (
 	"path"
 	"strconv"
 
-	"github.com/tendermint/tendermint/libs/cli"
-
 	"github.com/pelletier/go-toml"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
+	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/zondax/cobra"
 )
 
 const (
@@ -38,10 +37,8 @@ func ConfigCmd(defaultCLIHome string) *cobra.Command {
 		Args:  cobra.RangeArgs(0, 2),
 	}
 
-	cmd.Flags().String(cli.HomeFlag, defaultCLIHome,
-		"set client's home directory for configuration")
-	cmd.Flags().Bool(flagGet, false,
-		"print configuration value or its default if unset")
+	cmd.Flags().String(cli.HomeFlag, defaultCLIHome, "set client's home directory for configuration")
+	cmd.Flags().Bool(flagGet, false, "print configuration value or its default if unset")
 	return cmd
 }
 
@@ -57,7 +54,7 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 	}
 
 	// Load configuration
-	tree, err := loadConfigFile(cfgFile)
+	tree, err := loadConfigFile(cmd, cfgFile)
 	if err != nil {
 		return err
 	}
@@ -77,10 +74,10 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 	if getAction {
 		switch key {
 		case "trace", "trust-node", "indent":
-			fmt.Println(tree.GetDefault(key, false).(bool))
+			cmd.Println(tree.GetDefault(key, false).(bool))
 		default:
 			if defaultValue, ok := configDefaults[key]; ok {
-				fmt.Println(tree.GetDefault(key, defaultValue).(string))
+				cmd.Println(tree.GetDefault(key, defaultValue).(string))
 				return nil
 			}
 			return errUnknownConfigKey(key)
@@ -110,7 +107,7 @@ func runConfigCmd(cmd *cobra.Command, args []string) error {
 	if err := saveConfigFile(cfgFile, tree); err != nil {
 		return err
 	}
-	fmt.Fprintf(os.Stderr, "configuration saved to %s\n", cfgFile)
+	cmd.PrintErrf("configuration saved to %s\n", cfgFile)
 
 	return nil
 }
@@ -124,9 +121,9 @@ func ensureConfFile(rootDir string) (string, error) {
 	return path.Join(cfgPath, "config.toml"), nil
 }
 
-func loadConfigFile(cfgFile string) (*toml.Tree, error) {
+func loadConfigFile(p PrintErrCapable, cfgFile string) (*toml.Tree, error) {
 	if _, err := os.Stat(cfgFile); os.IsNotExist(err) {
-		fmt.Fprintf(os.Stderr, "%s does not exist\n", cfgFile)
+		p.PrintErrf("%s does not exist\n", cfgFile)
 		return toml.Load(``)
 	}
 

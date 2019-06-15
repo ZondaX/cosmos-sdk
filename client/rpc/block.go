@@ -1,19 +1,16 @@
 package rpc
 
 import (
-	"fmt"
 	"net/http"
 	"strconv"
 
-	"github.com/cosmos/cosmos-sdk/client/rest"
-
 	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/client/context"
-
+	"github.com/cosmos/cosmos-sdk/client/rest"
 	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
 	"github.com/spf13/viper"
 	tmliteProxy "github.com/tendermint/tendermint/lite/proxy"
+	"github.com/zondax/cobra"
 )
 
 //BlockCommand returns the verified block data for a given heights
@@ -103,7 +100,7 @@ func printBlock(cmd *cobra.Command, args []string) error {
 	if err != nil {
 		return err
 	}
-	fmt.Println(string(output))
+	cmd.Println(string(output))
 	return nil
 }
 

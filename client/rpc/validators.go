@@ -12,7 +12,7 @@ import (
 	"github.com/cosmos/cosmos-sdk/client/rest"
 
 	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 
 	"github.com/spf13/viper"
 	tmtypes "github.com/tendermint/tendermint/types"

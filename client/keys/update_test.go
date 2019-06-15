@@ -1,11 +1,7 @@
 package keys
 
 import (
-	"bufio"
-	"strings"
 	"testing"
-
-	"github.com/cosmos/cosmos-sdk/client"
 
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/spf13/viper"
@@ -25,13 +21,13 @@ func Test_runUpdateCmd(t *testing.T) {
 	fakeKeyName2 := "runUpdateCmd_Key2"
 
 	cmd := updateKeyCommand()
+	mockIn, _, _ := tests.ApplyMockIO(cmd)
 
 	// fails because it requests a password
 	err := runUpdateCmd(cmd, []string{fakeKeyName1})
 	assert.EqualError(t, err, "EOF")
 
-	cleanUp := client.OverrideStdin(bufio.NewReader(strings.NewReader("pass1234\n")))
-	defer cleanUp()
+	mockIn.Reset("pass1234\n")
 
 	// try again
 	err = runUpdateCmd(cmd, []string{fakeKeyName1})
@@ -51,8 +47,7 @@ func Test_runUpdateCmd(t *testing.T) {
 	assert.NoError(t, err)
 
 	// Try again now that we have keys
-	cleanUp2 := client.OverrideStdin(bufio.NewReader(strings.NewReader("pass1234\nNew1234\nNew1234")))
-	defer cleanUp2()
+	mockIn.Reset("pass1234\nNew1234\nNew1234")
 
 	// Incorrect key type
 	err = runUpdateCmd(cmd, []string{fakeKeyName1})

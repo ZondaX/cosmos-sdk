@@ -4,20 +4,17 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/tendermint/tendermint/crypto"
-
-	"github.com/cosmos/cosmos-sdk/crypto/keys"
-
 	"errors"
 
-	"github.com/gorilla/mux"
-	"github.com/spf13/cobra"
-	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/crypto/multisig"
-	"github.com/tendermint/tendermint/libs/cli"
-
+	"github.com/cosmos/cosmos-sdk/crypto/keys"
 	"github.com/cosmos/cosmos-sdk/crypto/keys/keyerror"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	"github.com/gorilla/mux"
+	"github.com/spf13/viper"
+	"github.com/tendermint/tendermint/crypto"
+	"github.com/tendermint/tendermint/crypto/multisig"
+	"github.com/tendermint/tendermint/libs/cli"
+	"github.com/zondax/cobra"
 )
 
 const (
@@ -115,11 +112,11 @@ func runShowCmd(cmd *cobra.Command, args []string) (err error) {
 
 	switch {
 	case isShowAddr:
-		printKeyAddress(info, bechKeyOut)
+		printKeyAddress(cmd, info, bechKeyOut)
 	case isShowPubKey:
-		printPubKey(info, bechKeyOut)
+		printPubKey(cmd, info, bechKeyOut)
 	default:
-		printKeyInfo(info, bechKeyOut)
+		printKeyInfo(cmd, info, bechKeyOut)
 	}
 
 	return nil

@@ -21,10 +21,14 @@ import (
 	"github.com/tendermint/tendermint/libs/log"
 	pvm "github.com/tendermint/tendermint/privval"
 
-	"github.com/cosmos/cosmos-sdk/client"
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/server/config"
 	"github.com/cosmos/cosmos-sdk/version"
+)
+
+var (
+	// LineBreak can be included in a command list to provide a blank line to help with readability
+	LineBreak = &cobra.Command{Run: func(*cobra.Command, []string) {}}
 )
 
 // server context
@@ -149,10 +153,10 @@ func AddCommands(
 	rootCmd.AddCommand(
 		StartCmd(ctx, appCreator),
 		UnsafeResetAllCmd(ctx),
-		client.LineBreak,
+		LineBreak,
 		tendermintCmd,
 		ExportCmd(ctx, cdc, appExport),
-		client.LineBreak,
+		LineBreak,
 		version.VersionCmd,
 	)
 }

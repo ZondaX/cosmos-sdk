@@ -255,7 +255,7 @@ Note that the errors of our module inherit from the `sdk.Error` interface and th
 
 Go in the `cli` folder and create a `simple_governance.go` file. This is where we will define the commands for our module.
 
-The CLI builds on top of [Cobra](https://github.com/spf13/cobra). Here is the schema to build a command on top of Cobra:
+The CLI builds on top of [Cobra](https://github.com/zondax/cobra). Here is the schema to build a command on top of Cobra:
 
 ```go
     // Declare flags

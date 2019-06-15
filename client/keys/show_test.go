@@ -1,12 +1,11 @@
 package keys
 
 import (
+	"github.com/tendermint/tendermint/libs/cli"
 	"testing"
 
 	"github.com/cosmos/cosmos-sdk/tests"
 	"github.com/spf13/viper"
-	"github.com/tendermint/tendermint/libs/cli"
-
 	"github.com/tendermint/tendermint/crypto/secp256k1"
 
 	"github.com/stretchr/testify/assert"
@@ -37,6 +36,12 @@ func Test_showKeysCmd(t *testing.T) {
 
 func Test_runShowCmd(t *testing.T) {
 	cmd := showKeysCmd()
+	_, mockOut, mockErr := tests.ApplyMockIO(cmd)
+
+	// Prepare a key base
+	kbHome, cleanUp := tests.NewTestCaseDir(t)
+	defer cleanUp()
+	viper.Set(cli.HomeFlag, kbHome)
 
 	err := runShowCmd(cmd, []string{"invalid"})
 	assert.EqualError(t, err, "Key invalid not found")
@@ -44,12 +49,7 @@ func Test_runShowCmd(t *testing.T) {
 	err = runShowCmd(cmd, []string{"invalid1", "invalid2"})
 	assert.EqualError(t, err, "Key invalid1 not found")
 
-	// Prepare a key base
 	// Now add a temporary keybase
-	kbHome, cleanUp := tests.NewTestCaseDir(t)
-	defer cleanUp()
-	viper.Set(cli.HomeFlag, kbHome)
-
 	fakeKeyName1 := "runShowCmd_Key1"
 	fakeKeyName2 := "runShowCmd_Key2"
 	kb, err := NewKeyBaseFromHomeFlag()
@@ -79,7 +79,33 @@ func Test_runShowCmd(t *testing.T) {
 	err = runShowCmd(cmd, []string{fakeKeyName1, fakeKeyName2})
 	assert.NoError(t, err)
 
-	// TODO: Capture stdout and compare
+	assert.Equal(t, "", mockOut.String())
+	assert.Equal(t, "", mockErr.String())
+
+	// Not set output flag and retry
+
+	// Now try single key - set bech to acc
+	viper.Set(cli.OutputFlag, OutputFormatText)
+	viper.Set(FlagBechPrefix, "acc")
+	err = runShowCmd(cmd, []string{fakeKeyName1})
+	assert.NoError(t, err)
+
+	// Now try multisig key - set bech to acc
+	viper.Set(FlagBechPrefix, "acc")
+	viper.Set(flagMultiSigThreshold, "dd")
+	err = runShowCmd(cmd, []string{fakeKeyName1, fakeKeyName2})
+	assert.EqualError(t, err, "threshold must be a positive integer")
+
+	// Now try multisig key - set bech to acc + threshold=2
+	viper.Set(FlagBechPrefix, "acc")
+	viper.Set(flagMultiSigThreshold, 2)
+	err = runShowCmd(cmd, []string{fakeKeyName1, fakeKeyName2})
+	assert.NoError(t, err)
+
+	expectedStdOut := "NAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\nrunShowCmd_Key1\toffline\tcosmos1w34k53py5v5xyluazqpq65agyajavep2rflq6h\tcosmospub1addwnpepqd87l8xhcnrrtzxnkql7k55ph8fr9jarf4hn6udwukfprlalu8lgw0urza0\nNAME:\tTYPE:\tADDRESS:\t\t\t\t\t\tPUBKEY:\nmulti\tlocal\tcosmos199nk5ren97x97hezxrn3wnyfn05xvacvxtftjl\tcosmospub1ytql0csgqgfzd666axrjzq60a7wd03xxxkyd8vpladfgrwwjxt96xnt084c6aevjz8lmlc07sufzd666axrjzqnq6py8500uay3gam3dpkp6grmpx864z5nv3efqvml8lc0y55ykvcn2hrdl\n"
+
+	assert.Equal(t, expectedStdOut, mockOut.String())
+	assert.Equal(t, "", mockErr.String())
 }
 
 func Test_validateMultisigThreshold(t *testing.T) {

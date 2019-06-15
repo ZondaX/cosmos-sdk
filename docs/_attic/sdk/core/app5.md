@@ -57,7 +57,7 @@ func newApp(logger log.Logger, db dbm.DB) abci.Application {
 }
 ```
 
-Note we utilize the popular [cobra library](https://github.com/spf13/cobra)
+Note we utilize the popular [cobra library](https://github.com/zondax/cobra)
 for the CLI, in concert with the [viper library](https://github.com/spf13/library)
 for managing configuration. See our [cli library](https://github.com/tendermint/blob/master/tmlibs/cli/setup.go)
 for more details.

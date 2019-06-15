@@ -9,7 +9,7 @@ import (
 	"github.com/spf13/viper"
 	"github.com/tendermint/tendermint/libs/cli"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 )
 
 func Test_runListCmd(t *testing.T) {

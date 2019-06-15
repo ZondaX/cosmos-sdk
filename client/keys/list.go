@@ -3,7 +3,7 @@ package keys
 import (
 	"net/http"
 
-	"github.com/spf13/cobra"
+	"github.com/zondax/cobra"
 )
 
 func listKeysCmd() *cobra.Command {
@@ -24,7 +24,7 @@ func runListCmd(cmd *cobra.Command, args []string) error {
 
 	infos, err := kb.List()
 	if err == nil {
-		printInfos(infos)
+		printInfos(cmd, infos)
 	}
 	return err
 }
